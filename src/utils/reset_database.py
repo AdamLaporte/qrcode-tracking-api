@@ -24,9 +24,11 @@ class ResetDatabase(metaclass=Singleton):
 
         init_db = open("data/init_db.sql", encoding="utf-8")
         init_db_as_string = init_db.read()
+        init_db.close()
 
         pop_db = open("data/pop_db.sql", encoding="utf-8")
         pop_db_as_string = pop_db.read()
+        pop_db.close()
 
         try:
             with DBConnection().connection as connection:
