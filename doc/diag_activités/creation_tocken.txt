@@ -2,7 +2,7 @@ Pour visualiser le diagramme, il suffit de coller le code ci-dessous dans:
  https://www.planttext.com/ qui est un PlantText est un éditeur en ligne rapide et gratuit  permettant de créer des diagrammes UML 
 à partir de code PlantUML.
 
-**DIAGRAMME D'ACTIVITE DE CREATION DE TOCKEN
+**DIAGRAMME D'ACTIVITE DE CONNEXION ET CREATION DE TOCKEN
 
 @startuml
 start
@@ -29,5 +29,8 @@ stop
 
 Pour voir directement le résultat, il suffit d'aller sur:
 https://uml.planttext.com/plantuml/png/RP5DJiCm48Ntbdo7KJTD9KxGB2WBn1xHhjYOPD8EE7PaZol4QTZc7BuOan-X5EBLM7hlUqypXyWcS6gjLkEabLRx8vEbQ1XJW8BgEsWzGutGcHXnLuhYbFj03M60I62tQM70JugCW0xUJCHo0583nV6_v7u7V15TuHFjj09vj-3aWFs7AAx6akJFlZhtx_cxd1m3-sKfuk3JDVThz37X6Tcdu2J1uemVkSRnZ4GR4GhdtTBsb7idtSGchPn4e4cJlLoe7bt0iy323Vvt5UibrcZeQcgq-bjb_z0qL5t4rsACvYpBs688ijHNjpbX8cln2wgG-wbevTkESIFG6JYSsNTQ7UG_Nlq7
+<<<<<<<< HEAD:doc/diag_activités/connexion_et_creation_tocken.txt
+========
 
 
+>>>>>>>> 1c6aa8494cc2a33e5abac1fd909a6371bd72e463:doc/diag_activités/creation_tocken.txt
