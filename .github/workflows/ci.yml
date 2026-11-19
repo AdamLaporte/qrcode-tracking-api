@@ -1,6 +1,6 @@
 name: pipeline
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U user -d test_db"
+          --health-cmd="pg_isready -U postgres_user -d test_db"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -43,13 +43,15 @@ jobs:
 
     - name: Create .env file
       run: |
-        echo "WEBSERVICE_HOST=https://pokeapi.co/api/v2" > .env
-        echo "POSTGRES_HOST=localhost" >> .env
+        echo "POSTGRES_HOST=localhost" > .env
         echo "POSTGRES_PORT=5432" >> .env
         echo "POSTGRES_DATABASE=test_db" >> .env
         echo "POSTGRES_USER=postgres_user" >> .env
         echo "POSTGRES_PASSWORD=postgres_pwd" >> .env
         echo "POSTGRES_SCHEMA=projet" >> .env
+        echo "BASE_URL=http://localhost:5000" >> .env
+        echo "SCAN_BASE_URL=http://localhost:5000/scan" >> .env
+        echo "QRCODE_OUTPUT_DIR=static/qrcodes" >> .env
 
     - name: Wait for PostgreSQL
       run: |

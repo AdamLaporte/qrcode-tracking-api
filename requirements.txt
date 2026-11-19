@@ -1,5 +1,3 @@
-#pip install -r requirements.txt
-
 # API Web
 fastapi
 uvicorn[standard]
@@ -21,9 +19,11 @@ InquirerPy
 # Utilitaires
 PyYAML
 
-# Tests
+# Tests et qualité
 pytest
 httpx
+coverage
+pylint
 
 # Token
 python-multipart

@@ -163,3 +163,6 @@ logs/*
 
 static/qrcodes/
 
+
+# Exemple de configuration (versionné)
+!.env.example
