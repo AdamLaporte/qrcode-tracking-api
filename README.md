@@ -1,5 +1,7 @@
 # QR Code Tracking API
 
+[![CI](https://github.com/AdamLaporte/qrcode-tracking-api/actions/workflows/ci.yml/badge.svg)](https://github.com/AdamLaporte/qrcode-tracking-api/actions/workflows/ci.yml)
+
 Application de **génération et de suivi de QR codes** : une API REST en FastAPI, une base PostgreSQL et une
 interface en ligne de commande. Projet informatique de 2e année à l'ENSAI (septembre – novembre 2025),
 réalisé à cinq.
@@ -134,8 +136,9 @@ touchent donc pas aux données de l'application.
 PYTHONPATH=src pytest
 ```
 
-Le projet compte **11 fichiers de tests** : tests d'intégration des DAO sur une vraie base, tests unitaires des
-services avec des *mocks*, et tests de l'API avec le client de test de FastAPI. La CI GitHub Actions lance
+Le projet compte **116 tests** répartis en 11 fichiers : tests d'intégration des DAO sur une vraie base, tests
+unitaires des services avec des *mocks*, et tests de l'API avec le client de test de FastAPI. La couverture
+atteint **85 %** sur les couches DAO et service. La CI GitHub Actions lance
 toute la suite à chaque push sur une base PostgreSQL éphémère, mesure la couverture et vérifie la qualité du
 code avec pylint.
 
