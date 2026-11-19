@@ -12,13 +12,9 @@ SCAN_BASE = os.getenv("SCAN_BASE_URL")
 class QRCodeNotFoundError(Exception):
     """Erreur levée si le QR code n'existe pas."""
 
-    pass
-
 
 class UnauthorizedError(Exception):
     """Erreur levée si l'utilisateur n'est pas le propriétaire du QR code."""
-
-    pass
 
 
 class QRCodeService:

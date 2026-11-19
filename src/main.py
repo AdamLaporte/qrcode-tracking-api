@@ -1,7 +1,7 @@
 """
 Lanceur principal de l'application en ligne de commande (CLI).
 
-Ce module initialise l'environnement, le système de logs et démarre la boucle 
+Ce module initialise l'environnement, le système de logs et démarre la boucle
 principale de navigation entre les différentes vues (menus) de l'application.
 """
 import logging
@@ -11,12 +11,9 @@ from utils.log_init import initialiser_logs
 from view.accueil.accueil_vue import AccueilVue
 
 if __name__ == "__main__":
-    """
-    Point d'entrée principal. 
-    
-    Orchestre le démarrage de l'application, gère la navigation dans les menus
-    et assure une gestion des erreurs pour maintenir la boucle active.
-    """
+    # Point d'entrée principal.
+    # Orchestre le démarrage de l'application, gère la navigation dans les menus
+    # et assure une gestion des erreurs pour maintenir la boucle active.
     # Charger les variables d'environnement (BASE_URL, DB config, etc.)
     dotenv.load_dotenv(override=True)
 

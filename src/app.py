@@ -2,9 +2,12 @@ import os
 import logging
 import requests
 from dotenv import load_dotenv
-from dotenv import load_dotenv
+
+# Chargé avant les imports du projet : certains modules lisent les variables
+# d'environnement dès leur import (dossier de sortie des QR codes, URL...).
 load_dotenv()
-from datetime import datetime, timezone 
+
+from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Request, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse, JSONResponse, FileResponse
@@ -21,7 +24,6 @@ from dao.token_dao import TokenDao
 
 
 # Logging de base
-# BON
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 

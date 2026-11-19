@@ -5,7 +5,7 @@ class Statistique:
     """
     Classe représentant les Statistiques.
 
-    Attributs 
+    Attributs
     ------------------
    id_qrcode : int
         Identifiant du QR code.

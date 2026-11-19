@@ -51,7 +51,7 @@ def generate_qr_png_bytes(
             img_w, img_h = img.size
             max_logo_w = int(img_w * logo_scale)
             max_logo_h = int(img_h * logo_scale)
-            logo.thumbnail((max_logo_w, max_logo_h), Image.LANCZOS)
+            logo.thumbnail((max_logo_w, max_logo_h), Image.Resampling.LANCZOS)
             lx = (img_w - logo.width) // 2
             ly = (img_h - logo.height) // 2
             img.paste(logo, (lx, ly), logo)

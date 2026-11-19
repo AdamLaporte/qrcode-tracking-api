@@ -13,7 +13,7 @@ class ResetDatabase(metaclass=Singleton):
     """
     Réinitialisation de la base de données:
     - test_dao=False: schéma 'projet' + data/init_db.sql + data/pop_db.sql
-    - test_dao=True : schéma 'projet_test_dao' + data/init_db.sql (search_path remplacé) 
+    - test_dao=True : schéma 'projet_test_dao' + data/init_db.sql (search_path remplacé)
                                                + data/pop_db_test.sql
     """
 

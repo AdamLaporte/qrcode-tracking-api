@@ -8,7 +8,7 @@ python-dotenv
 requests
 
 # Base de données
-psycopg2
+psycopg2-binary
 
 # Génération QR Code
 qrcode
@@ -17,7 +17,6 @@ segno
 
 # Interface Ligne de Commande (CLI)
 InquirerPy
-regex
 
 # Utilitaires
 PyYAML

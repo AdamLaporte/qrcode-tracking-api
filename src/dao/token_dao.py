@@ -110,7 +110,7 @@ class TokenDao(metaclass=Singleton):
                         "DELETE FROM Token WHERE jeton = %(jeton)s;",
                         {"jeton": token.jeton},
                     )
-                    res = cursor.rowcount 
+                    res = cursor.rowcount
         except Exception as e:
             logging.info(f"Erreur lors de la suppression du token {token.jeton}: {e}")
             return False

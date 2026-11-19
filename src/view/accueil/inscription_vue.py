@@ -1,16 +1,13 @@
-import regex
-from InquirerPy import inquirer
-from InquirerPy.validator import EmptyInputValidator, PasswordValidator
-from prompt_toolkit.validation import ValidationError, Validator
-import requests # AJOUT
-import os       # AJOUT
-import json     # AJOUT
+import json
+import os
 
-# MODIFIÉ : Suppression de l'import du service local
-# from service.utilisateur_service import UtilisateurService 
+import requests
+from InquirerPy import inquirer
+from InquirerPy.validator import PasswordValidator
+
 from view.vue_abstraite import VueAbstraite
 
-# AJOUT : Définir l'URL de l'API
+# URL de l'API (définie dans le fichier .env)
 API_BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:5000")
 
 
@@ -19,8 +16,7 @@ class InscriptionVue(VueAbstraite):
         # Demande à l'utilisateur de saisir nom, mot de passe...
         nom = inquirer.text(message="Entrez votre nom d'utilisateur : ").execute()
 
-        # MODIFIÉ : La vérification d'unicité est maintenant gérée par l'API
-        # if UtilisateurService().nom_user_deja_utilise(nom): ... (supprimé)
+        # L'unicité du nom d'utilisateur est vérifiée par l'API
 
         mdp = inquirer.secret(
             message="Entrez votre mot de passe : ",
@@ -40,13 +36,13 @@ class InscriptionVue(VueAbstraite):
                 "nom_user": nom,
                 "mdp": mdp
             }
-            
+
             print(f"Appel de l'API POST {register_endpoint} pour créer le compte...")
-            
+
             response = requests.post(register_endpoint, json=payload, timeout=10)
-            
+
             response.raise_for_status() # Lève une erreur si 4xx ou 5xx
-            
+
             response_data = response.json()
             message = (
                 f"Votre compte {response_data.get('nom_user', nom)} a été créé avec succès.\n"
@@ -60,10 +56,10 @@ class InscriptionVue(VueAbstraite):
             except json.JSONDecodeError:
                 detail = http_err.response.text
             message = f"Erreur API lors de l'inscription: {http_err.response.status_code} - {detail}"
-        
+
         except requests.exceptions.RequestException as req_err:
             message = f"Erreur de connexion à l'API: {req_err}\nVérifiez que l'API (app.py) est bien lancée sur {API_BASE_URL}."
-        
+
         except Exception as e:
             message = f"Erreur inattendue lors de l'inscription : {e}"
         # --- FIN MODIFICATION ---

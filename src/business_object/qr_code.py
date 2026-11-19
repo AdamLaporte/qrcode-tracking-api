@@ -22,7 +22,7 @@ class Qrcode:
         type_qrcode : bool (True = QR dynamique, False = statique)
         couleur : couleur optionnelle
         logo : chemin de logo optionnel
-    
+
     """
 
     def __init__(

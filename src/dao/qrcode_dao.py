@@ -10,13 +10,9 @@ logger = logging.getLogger(__name__)
 class QRCodeNotFoundError(Exception):
     """Erreur levée lorsqu’un QR code est introuvable."""
 
-    pass
-
 
 class UnauthorizedError(Exception):
     """Erreur levée lorsqu’un utilisateur tente de modifier un QR code qui ne lui appartient pas."""
-
-    pass
 
 
 class QRCodeDao:

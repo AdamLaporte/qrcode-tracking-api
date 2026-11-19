@@ -23,7 +23,7 @@ class LogScanDao(metaclass=Singleton):
                     cur.execute(
                         """
                         INSERT INTO logs_scan (
-                            id_qrcode, client_host, user_agent, referer, 
+                            id_qrcode, client_host, user_agent, referer,
                             accept_language, geo_country, geo_region, geo_city, date_scan
                         )
                         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
@@ -77,7 +77,7 @@ class LogScanDao(metaclass=Singleton):
                 with conn.cursor() as cur:
                     cur.execute(
                         """
-                        SELECT client_host, user_agent, date_scan, referer, 
+                        SELECT client_host, user_agent, date_scan, referer,
                                accept_language, geo_country, geo_region, geo_city
                         FROM logs_scan
                         WHERE id_qrcode = %s
