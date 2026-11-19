@@ -41,7 +41,7 @@ class AccueilVue(VueAbstraite):
             case "Créer un compte":
                 from view.accueil.inscription_vue import InscriptionVue
 
-                return InscriptionVue("Création de compte joueur")
+                return InscriptionVue("Création de compte")
 
             case "Ré-initialiser la base de données":
                 succes = ResetDatabase().lancer()

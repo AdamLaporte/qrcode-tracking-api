@@ -1,86 +1,177 @@
+# QR Code Tracking API
 
-# QR Code Tracking Project - Group 32
+Application de **génération et de suivi de QR codes** : une API REST en FastAPI, une base PostgreSQL et une
+interface en ligne de commande. Projet informatique de 2e année à l'ENSAI (septembre – novembre 2025),
+réalisé à cinq.
 
-A comprehensive application for generating, managing, and tracking QR codes using Python (FastAPI) and PostgreSQL.
+Un QR code classique pointe directement vers son lien et ne dit rien sur son utilisation. Avec cette application, un
+QR code **suivi** pointe vers l'API, qui enregistre le scan puis redirige vers la destination. Le propriétaire
+consulte ensuite ses statistiques : nombre de vues par jour, appareil, langue et localisation approximative des
+scans.
 
-## Installation & Setup
+## Fonctionnalités
 
-### 1. Install Dependencies
-Ensure Python 3.13+ is installed, then run:
+- **Comptes utilisateurs** : inscription, connexion et authentification par jeton Bearer, valable 5 heures.
+- **Création de QR codes** :
+  - **statiques**, qui contiennent directement le lien ;
+  - **suivis**, qui passent par la route `/scan/{id}` de l'API ;
+  - couleur et logo central personnalisables, image PNG servie par l'API.
+- **Gestion** : lister, modifier la destination et supprimer ses QR codes. Seul le propriétaire peut agir sur un
+  QR code.
+- **Suivi des scans** : à chaque scan d'un QR code suivi, l'API enregistre la date, le *user agent*, la langue, le
+  *referer* et une géolocalisation par IP (pays, région, ville), puis redirige vers la destination.
+- **Statistiques** : vues totales, date du premier et du dernier scan, vues par jour et détail des derniers scans.
+
+## Architecture
+
+Le code suit une architecture en couches. Chaque couche ne dépend que de celle du dessous.
+
+```mermaid
+flowchart LR
+    CLI["CLI<br/>(InquirerPy)"] -->|HTTP + jeton| API
+    Tel["Smartphone<br/>scan du QR code"] -->|GET /scan/id| API
+    API["API REST<br/>FastAPI"] --> S["Services<br/>règles métier"]
+    S --> D["DAO<br/>accès aux données"]
+    D --> DB[("PostgreSQL")]
+    S -.-> BO["Objets métier<br/>Utilisateur, QRCode,<br/>Token, Statistique, LogScan"]
+```
+
+| Couche | Dossier | Rôle |
+|--------|---------|------|
+| Objets métier | [`src/business_object`](src/business_object) | Entités du domaine, attributs privés et propriétés |
+| DAO | [`src/dao`](src/dao) | Requêtes SQL paramétrées (psycopg2), une classe par table |
+| Services | [`src/service`](src/service) | Logique métier : hachage des mots de passe, droits, génération des images |
+| API | [`src/app.py`](src/app.py) | Routes REST, injection de dépendances, authentification OAuth2 *password flow* |
+| CLI | [`src/view`](src/view) | Menus en terminal qui consomment l'API |
+
+### Modèle de données
+
+```mermaid
+erDiagram
+    UTILISATEUR ||--o{ TOKEN : possede
+    UTILISATEUR ||--o{ QRCODE : cree
+    QRCODE ||--o{ STATISTIQUE : "vues par jour"
+    QRCODE ||--o{ LOGS_SCAN : "detail des scans"
+    UTILISATEUR { int id_user PK
+                  text nom_user UK
+                  text mdp }
+    TOKEN { int id_token PK
+            text jeton UK
+            timestamptz date_expiration }
+    QRCODE { int id_qrcode PK
+             text url
+             bool type_qrcode
+             text couleur
+             text logo }
+    STATISTIQUE { int id_stat PK
+                  date date_des_vues
+                  int nombre_vue }
+    LOGS_SCAN { int id_scan PK
+                timestamptz date_scan
+                text user_agent
+                text geo_country
+                text geo_city }
+```
+
+### Routes de l'API
+
+| Méthode | Route | Accès | Description |
+|---------|-------|-------|-------------|
+| `POST` | `/register` | public | Création de compte |
+| `POST` | `/login` | public | Connexion, renvoie un jeton Bearer |
+| `POST` | `/qrcode/` | jeton | Création d'un QR code (statique ou suivi) |
+| `GET` | `/qrcode/utilisateur/me` | jeton | QR codes de l'utilisateur connecté |
+| `GET` | `/qrcode/{id}` | public | Détail d'un QR code |
+| `GET` | `/qrcode/{id}/image` | public | Image PNG du QR code |
+| `PUT` | `/qrcode/{id}` | propriétaire | Modification de la destination, de la couleur, du logo |
+| `DELETE` | `/qrcode/{id}` | propriétaire | Suppression |
+| `GET` | `/qrcode/{id}/stats` | propriétaire | Statistiques et derniers scans |
+| `GET` | `/scan/{id}` | public | Enregistre le scan puis redirige vers la destination |
+
+La documentation interactive (Swagger) est disponible sur `/docs` une fois l'API lancée.
+
+## Installation
+
+Prérequis : Python 3.13 ou plus et une base PostgreSQL.
+
 ```bash
+git clone https://github.com/AdamLaporte/qrcode-tracking-api.git
+cd qrcode-tracking-api
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-````
-
-### 2\. Environment Configuration
-
-Create a `.env` file at the project root and configure your database credentials:
-
-```ini
-# Database Configuration
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DATABASE=your_db_name
-POSTGRES_USER=your_username
-POSTGRES_PASSWORD=your_password
-POSTGRES_SCHEMA=projet
-
-# API Configuration
-PORT=5000
-BASE_URL="link that give you onyxia for the port: ex : [https://user-id2774-358651-user.user.lab.sspcloud.fr](https://user-id2774-358651-user.user.lab.sspcloud.fr)"
-SCAN_BASE_URL="same link but with /scan at the end : ex : [https://user-id2774-358651-user.user.lab.sspcloud.fr/scan](https://user-id2774-358651-user.user.lab.sspcloud.fr/scan)"
-QRCODE_OUTPUT_DIR=static/qrcodes
+cp .env.example .env   # puis renseigner les accès à la base
 ```
 
-## How to Run
+Toutes les variables sont documentées dans [`.env.example`](.env.example).
 
-### 1\. Command-Line Interface (CLI)
+## Utilisation
 
-The application provides a terminal-based interface (CLI) to interact with the system, manage the database, and handle QR codes.
-
-To launch the CLI:
-
-```bash
-python src/main.py
-```
-
-**Key Features available in the CLI:**
-
-  * **Database Initialization:**
-
-      * Select **"Ré-initialiser la base de données"** on the first run. This will create the schema, tables, and populate the database with demo data (users, tokens, sample QR codes).
-
-  * **Authentication:**
-
-      * **"Créer un compte"**: Register a new user (calls the API).
-      * **"Se connecter"**: Log in to access private features.
-
-  * **User Menu (Once logged in):**
-
-      * **Create QR Codes**: Generate new QR codes. You can choose between **Static** (direct link) or **Tracked** (dynamic link with stats), and customize the color or add a logo.
-      * **My QR Codes**: List all QR codes associated with your account.
-      * **Statistics**: For tracked QR codes, view detailed analytics including total views, dates, and recent scan logs (Device, IP, Location).
-      * **Management**: Modify destination URLs or delete existing QR codes.
-
-### 2\. Launch the API Server
-
-To start the backend webservice (required for the CLI to work properly for auth and tracking):
+Lancer l'API (terminal 1) :
 
 ```bash
 python src/app.py
 ```
 
-The server will start on the BASE\_URL defined in your `.env`.
-
-  * **Interactive Docs:** `[BASE_URL]/docs` (e.g., `https://.../docs`).
-
-## Testing
-
-To run unit tests (using a dedicated test schema):
+Lancer la CLI (terminal 2) :
 
 ```bash
-pytest
+python src/main.py
 ```
 
-## Team
+Au premier lancement, choisir **« Ré-initialiser la base de données »** dans la CLI : le schéma est créé et
+rempli avec des données de démonstration. Ensuite, créer un compte, se connecter, puis créer un QR code
+« suivi ». Le scanner avec un téléphone fait apparaître le scan dans les statistiques.
 
-Adam LAPORTE, Ahmed BEIJI, Lesline Méralda KENNE YONTA, Maytena LABINSKY, Louis ROUX.
+> Pour qu'un téléphone puisse scanner un QR code suivi, `SCAN_BASE_URL` doit être une adresse joignable depuis
+> l'extérieur. Pendant le projet, l'API était hébergée sur la plateforme Onyxia du SSP Cloud.
+
+## Tests
+
+Les tests utilisent un schéma PostgreSQL dédié (`projet_test_dao`), recréé à partir des scripts SQL. Ils ne
+touchent donc pas aux données de l'application.
+
+```bash
+PYTHONPATH=src pytest
+```
+
+Le projet compte **11 fichiers de tests** : tests d'intégration des DAO sur une vraie base, tests unitaires des
+services avec des *mocks*, et tests de l'API avec le client de test de FastAPI. La CI GitHub Actions lance
+toute la suite à chaque push sur une base PostgreSQL éphémère, mesure la couverture et vérifie la qualité du
+code avec pylint.
+
+## Organisation du projet
+
+- **Conception d'abord** : diagrammes UML de cas d'utilisation, de classes, d'activité et de séquence, réunis dans
+  le [rapport d'analyse](doc/rapport_analyse.pdf). Les sources PlantUML sont dans
+  [`doc/diagrammes`](doc/diagrammes).
+- **Suivi hebdomadaire** de l'avancement dans [`doc/suivi`](doc/suivi).
+- **Répartition par entité** : chaque membre a pris en charge une entité de bout en bout (classe métier, DAO,
+  service, tests), relue par un autre membre.
+
+| Membre | Contributions principales |
+|--------|---------------------------|
+| **Adam Laporte** | Entité `Utilisateur`, **API FastAPI**, **interface CLI**, suivi des scans et géolocalisation, scripts de base de données, intégration et nettoyage final |
+| Lesline Kenne Yonta | Entité `QRCode`, diagrammes de séquence et de classes, documentation du code |
+| Mayténa Labinsky | Entité `Token` et authentification |
+| Louis Roux | Entité `Statistique`, schéma de la base de données |
+| Ahmed Beji | Conception de la base de données et cohérence des schémas |
+
+## Pistes d'amélioration
+
+- **Mots de passe** : remplacer le hachage SHA-256 salé par un algorithme lent conçu pour cet usage (bcrypt ou
+  Argon2).
+- **Géolocalisation** : elle repose sur le service gratuit ip-api.com, appelé en HTTP. Une base locale (GeoLite2)
+  éviterait l'appel externe et protégerait mieux la vie privée des personnes qui scannent.
+- **Accès aux QR codes** : le détail et l'image d'un QR code sont publics. Les réserver à leur propriétaire
+  protégerait les URL de destination.
+- **Déploiement** : conteneuriser l'API et la base (Docker Compose) pour lancer le projet en une commande.
+
+## Stack
+
+Python · FastAPI · Pydantic · PostgreSQL · psycopg2 · qrcode / segno / Pillow · InquirerPy · pytest ·
+GitHub Actions
+
+## Licence et origine
+
+Projet construit à partir du [template du projet informatique de 2e année de l'ENSAI](https://github.com/ludo2ne/ENSAI-2A-projet-info-template)
+(Ludovic Deneuville), dont l'historique est conservé. Distribué sous licence GPL v3, voir [LICENSE](LICENSE).
